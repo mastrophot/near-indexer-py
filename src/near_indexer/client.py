@@ -32,7 +32,30 @@ class NEARIndexerClient:
         return TransactionModel(**result)
 
     def list_transactions_for_account(self, account_id: str, limit: int = 10) -> List[TransactionModel]:
-        # This typically requires an archival node or a specific indexer API
-        # Here we mock the pagination/filtering logic for the exercise
-        print(f"Mocking transaction list for {account_id} with limit {limit}")
-        return []
+        """
+        Fetches real-time transactions for an account using NearBlocks API.
+        """
+        network = "api" if "mainnet" in self.rpc_url else "api-testnet"
+        api_url = f"https://{network}.nearblocks.io/v1/account/{account_id}/txns"
+        
+        try:
+            response = requests.get(api_url, params={"limit": limit}, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            transactions = []
+            for tx in data.get("txns", []):
+                # Map NearBlocks fields to our TransactionModel
+                # This is a simplified mapping for demonstration
+                transactions.append(TransactionModel(
+                    transaction_hash=tx.get("transaction_hash"),
+                    signer_id=tx.get("signer_id"),
+                    receiver_id=tx.get("receiver_id"),
+                    block_hash=tx.get("block_hash"),
+                    status=tx.get("status")
+                ))
+            return transactions
+        except Exception as e:
+            print(f"Error fetching real transactions: {e}. Falling back to empty list.")
+            return []
+
