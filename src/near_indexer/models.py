@@ -2,12 +2,13 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Any
 
 class TransactionModel(BaseModel):
-    hash: str
+    transaction_hash: str
     signer_id: str
     receiver_id: str
     block_hash: str
-    block_timestamp: int
-    actions: List[Any]
+    block_timestamp: Optional[int] = None
+    actions: List[Any] = Field(default_factory=list)
+    status: Optional[str] = None
 
 class ReceiptModel(BaseModel):
     receipt_id: str

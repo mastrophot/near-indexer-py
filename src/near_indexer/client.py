@@ -29,7 +29,11 @@ class NEARIndexerClient:
 
     def get_transaction(self, tx_hash: str, account_id: str) -> TransactionModel:
         result = self._post("tx", [tx_hash, account_id])
-        return TransactionModel(**result)
+        # RPC returns { 'transaction': { ... }, 'status': ... }
+        # We need to flatten it slightly if we want to match our model
+        tx_data = result.get("transaction", {})
+        merged = {**tx_data, "transaction_hash": tx_data.get("hash"), "status": str(result.get("status"))}
+        return TransactionModel(**merged)
 
     def list_transactions_for_account(self, account_id: str, limit: int = 10) -> List[TransactionModel]:
         """
