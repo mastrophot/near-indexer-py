@@ -3,11 +3,23 @@ from typing import List, Optional, Any
 
 class TransactionModel(BaseModel):
     hash: str
-    signer_id: str = Field(..., alias="signer_id")
-    receiver_id: str = Field(..., alias="receiver_id")
+    signer_id: str
+    receiver_id: str
     block_hash: str
     block_timestamp: int
     actions: List[Any]
+
+class ReceiptModel(BaseModel):
+    receipt_id: str
+    predecessor_id: str
+    receiver_id: str
+    receipt: dict
+
+class OutcomeModel(BaseModel):
+    id: str
+    outcome: dict
+    proof: List[dict]
+    block_hash: str
 
 class BlockModel(BaseModel):
     author: str
